@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: springboot-pod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        pod: springboot-pod
+    spec:
+      containers:
+        - name: springboot-container
+          image: dmitriyf7498/springboot-deckerdemo:3.0.0
+          env:
+            - name: SPRINGBOOT_ENDPOINT
+              value: http://springboot
+          imagePullPolicy: IfNotPresent

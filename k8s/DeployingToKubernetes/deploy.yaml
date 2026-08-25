@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod: springboot-pod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        pod: springboot-pod
+    spec:
+      containers:
+        - name: springboot-container
+          image: dmitriyf7498/springboot-deckerdemo:3.0.0
+          resources:
+            requests:
+              cpu: 200m # Минимальные требования к ресурсам CPU
+              memory: 250Mi # Минимальные требования к ресурсам памяти
+            limits:
+              cpu: 300m # Максимальные требования к ресурсам CPU
+              memory: 300Mi # Максимальные требования к ресурсам памяти
+          readinessProbe:
+            initialDelaySeconds: 15 # Величина начальной задержки
+            periodSeconds: 30 # Выполняется с интервалом 30 секунд
+            httpGet:
+              path: /readyz # Выполняется этот HTTP-запрос
+              port: 8080
+              scheme: HTTP
+            timeoutSeconds: 2 # Тайм-аут ответа на запрос составляет 2 секунды
+            failureThreshold: 1 # Признаком неготовности контейнера считается получение хотя бы одного ответа с кодом ошибки
+            successThreshold: 1 # Признаком возвращения контейнера в состояние готовности считается получение хотя бы одного ответа с кодом успешного завершения
+          livenessProbe: # проверка жизнеспособности
+            initialDelaySeconds: 30 # Величина начальной задержки составляет 30 секунд
+            periodSeconds: 30 # Каждые 30 секунд
+            httpGet:
+              path: /healthz # Выполняется этот HTTP-запрос
+              port: 8080
+              scheme: HTTP
+            timeoutSeconds: 5 # Тайм-аут ответа на запрос составляет 5 секунд (более высокая степень терпимости по сравнению с проверкой готовности)
+            failureThreshold: 3 # Признаком неработоспособности контейнера считается получение десяти идущих подряд ответов с кодом ошибки
+            successThreshold: 1 # Признаком возвращения контейнера в работоспособное состояние считается получение хотя бы одного ответа с кодом успешного завершения

@@ -1,0 +1,25 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: springboot
+spec:
+  minReplicas: 1
+  maxReplicas: 10
+metrics:
+  - resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization:
+          20 # Целевое значение показателя потребления ресурсов
+          # процессора. HPA будет создавать дополнительные реплики
+          # в том случае, если данный показатель будет подниматься выше
+          # указанного значения
+    type: Resource
+scaleTargetRef:
+  apiVersion:
+    apps/v1 # Развертывание, которое
+    # будет подвергаться
+    # масштабированию
+  kind: Deployment
+  name: springboot

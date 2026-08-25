@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    command: python3 server.py
+    volumes:
+      # Привязываем каталог сборки контейнера
+      # на локальной машине к каталогу /app контейнера
+      # (который раньше указывался в файле Dockerfile)
+      - type: bind
+        source: .
+        target: /app
+    environment:
+      PYTHONDONTWRITEBYTECODE: 1
+    ports:
+      - "8080:80"
